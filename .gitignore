@@ -1,0 +1,21 @@
+# Personal AI usage notes (kept locally; summarized in the final report)
+AI_USAGE.md
+
+# Raw Statcast pulls are too big for GitHub; regenerate with src/fetch_data.py
+data/raw/*
+!data/raw/.gitkeep
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/

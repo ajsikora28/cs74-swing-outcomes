@@ -1,0 +1,8 @@
+# Pin exact versions once everything works: run `pip freeze` and copy the versions here
+pandas
+numpy
+scikit-learn
+pybaseball
+pyarrow
+matplotlib
+jupyter
