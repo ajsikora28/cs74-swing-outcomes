@@ -29,7 +29,7 @@ conditions = [
     (~data["launch_speed"].isna()) & (data["launch_speed"] < 95)
 ]
 
-values = ["no swing", "swing and miss", "foul", "hard contact", "weak contact"]
+values = ["no_swing", "swing_and_miss", "foul", "hard_contact", "weak_contact"]
 
 data["swing_result"] = np.select(conditions, values, default="unknown")
 
@@ -59,8 +59,6 @@ x_features = ["release_pos_x", "pfx_x", "plate_x"]
 for feature in x_features:
     data.loc[data["stand"] == "L", feature] = -data.loc[data["stand"] == "L", feature]
 data.loc[data["stand"] == "L", "spin_axis"] = 360 - data.loc[data["stand"] == "L", "spin_axis"]
-
-print(data[data["pitch_type"] == "FF"].groupby(["p_throws", "stand"])[["pfx_x", "spin_axis"]].mean())
 
 # Split into train, validation, and test sets based on game month
 train_data = data[data["game_date"].str[5:7].isin(["03","04", "05", "06", "07"])]
