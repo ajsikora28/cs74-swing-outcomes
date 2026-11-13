@@ -15,10 +15,11 @@ for start_dt, end_dt in month_dates:
 
 # Filter out rows with missing descriptions, pitchouts, automatic balls, bunts, and balls in play with no launch speed
 data = data[~(data["description"].isna()) & 
-            ~(data["description"].str.contains("pitchout")) & 
-            ~(data["description"].str.contains("automatic")) &
-            ~(data["description"].str.contains("bunt")) &
-            ~((data["description"].str.contains("hit_into_play")) & (data["launch_speed"].isna()))]
+            ~(data["description"].str.contains("pitchout",na=False)) & 
+            ~(data["description"].str.contains("automatic",na=False)) &
+            ~(data["description"].str.contains("bunt",na=False)) &
+            ~(data["des"].str.contains("bunt",na=False)) &
+            ~((data["description"].str.contains("hit_into_play",na=False)) & (data["launch_speed"].isna()))]
 
 conditions = [
     (data["description"].str.contains("ball")) | (data["description"].str.contains("called_strike")) | (data["description"].str.contains("hit_by_pitch")),
@@ -38,6 +39,9 @@ data = data[["game_date","pitch_type","release_speed","release_spin_rate","spin_
 bases = ["on_3b","on_2b","on_1b"]
 for base in bases:
     data[base] = data[base].notna().astype(int)
+
+# We need values for all of the features
+data = data.dropna()
 
 # Split into train, validation, and test sets based on game month
 train_data = data[data["game_date"].str[5:7].isin(["03","04", "05", "06", "07"])]
