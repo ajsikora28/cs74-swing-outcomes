@@ -1,4 +1,4 @@
-PITCH_FEATURES = ["same_hand", "stand", "p_throws", "pitch_type", "release_speed", "release_spin_rate", "spin_axis",
+PITCH_FEATURES = ["in_zone","same_hand", "stand", "p_throws", "pitch_type", "release_speed", "release_spin_rate", "spin_axis",
                   "release_extension", "release_pos_x", "release_pos_z", "pfx_x", "pfx_z", "plate_x", "plate_z"]   
 
 CONTEXT_FEATURES = PITCH_FEATURES + ["inning", "bat_score_diff", "count",

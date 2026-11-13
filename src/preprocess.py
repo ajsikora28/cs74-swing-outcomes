@@ -33,7 +33,7 @@ values = ["no swing", "swing and miss", "foul", "hard contact", "weak contact"]
 
 data["swing_result"] = np.select(conditions, values, default="unknown")
 
-data = data[["game_date","pitch_type","release_speed","release_spin_rate","spin_axis","release_extension","release_pos_x","release_pos_z",
+data = data[["game_date","pitch_type","zone","release_speed","release_spin_rate","spin_axis","release_extension","release_pos_x","release_pos_z",
              "pfx_x","pfx_z","plate_x","plate_z","on_3b","on_2b","on_1b","outs_when_up","balls","strikes","bat_score_diff","inning","stand","p_throws","swing_result"]]
 
 bases = ["on_3b","on_2b","on_1b"]
@@ -49,6 +49,10 @@ data = data.drop(columns=["balls","strikes"])
 
 # Add a column for whether the pitcher and batter are the same handedness
 data["same_hand"] = (data["stand"] == data["p_throws"]).astype(int)
+
+# Add a column for in/out of zone
+data["in_zone"] = (data["zone"] <= 9).astype(int)
+data = data.drop(columns=["zone"])
 
 # Then mirror pitch for a lefty batter so that all pitches are treated as if they were thrown to a righty batter
 x_features = ["release_pos_x", "pfx_x", "plate_x"]
