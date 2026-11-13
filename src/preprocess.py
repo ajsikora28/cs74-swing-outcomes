@@ -43,6 +43,21 @@ for base in bases:
 # We need values for all of the features
 data = data.dropna()
 
+# Add a column for the count and remove balls and strikes columns
+data["count"] = data["balls"].astype(str) + "-" + data["strikes"].astype(str)
+data = data.drop(columns=["balls","strikes"])
+
+# Add a column for whether the pitcher and batter are the same handedness
+data["same_hand"] = (data["stand"] == data["p_throws"]).astype(int)
+
+# Then mirror pitch for a lefty batter so that all pitches are treated as if they were thrown to a righty batter
+x_features = ["release_pos_x", "pfx_x", "plate_x"]
+for feature in x_features:
+    data.loc[data["stand"] == "L", feature] = -data.loc[data["stand"] == "L", feature]
+data.loc[data["stand"] == "L", "spin_axis"] = 360 - data.loc[data["stand"] == "L", "spin_axis"]
+
+print(data[data["pitch_type"] == "FF"].groupby(["p_throws", "stand"])[["pfx_x", "spin_axis"]].mean())
+
 # Split into train, validation, and test sets based on game month
 train_data = data[data["game_date"].str[5:7].isin(["03","04", "05", "06", "07"])]
 validation_data = data[data["game_date"].str[5:7] == "08"]
