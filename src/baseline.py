@@ -1,16 +1,19 @@
 import pandas as pd
+from evaluate import evaluate_model
 
 train_x = pd.read_csv("data/processed/train_x.csv")
 train_y = pd.read_csv("data/processed/train_y.csv")
+validation_x = pd.read_csv("data/processed/validation_x.csv")
+validation_y = pd.read_csv("data/processed/validation_y.csv")
 
 train = pd.concat([train_x, train_y], axis=1)
 
 probs = train.groupby(["pitch_type","in_zone","same_hand"],as_index=False).agg(
-    no_swing = ("swing_result", lambda x: (x == "no swing").mean()),
-    swing_and_miss = ("swing_result", lambda x: (x == "swing and miss").mean()),
+    no_swing = ("swing_result", lambda x: (x == "no_swing").mean()),
+    swing_and_miss = ("swing_result", lambda x: (x == "swing_and_miss").mean()),
     foul = ("swing_result", lambda x: (x == "foul").mean()),
-    hard_contact = ("swing_result", lambda x: (x == "hard contact").mean()),
-    weak_contact = ("swing_result", lambda x: (x == "weak contact").mean())
+    hard_contact = ("swing_result", lambda x: (x == "hard_contact").mean()),
+    weak_contact = ("swing_result", lambda x: (x == "weak_contact").mean())
 )
 
 # Find any rare pitch types
@@ -21,11 +24,11 @@ print(rare_pitch_types)
 
 # Create an overall probs df for rare pitch types
 overall_probs = train.groupby(["in_zone","same_hand"],as_index=False).agg(
-    no_swing = ("swing_result", lambda x: (x == "no swing").mean()),
-    swing_and_miss = ("swing_result", lambda x: (x == "swing and miss").mean()),
+    no_swing = ("swing_result", lambda x: (x == "no_swing").mean()),
+    swing_and_miss = ("swing_result", lambda x: (x == "swing_and_miss").mean()),
     foul = ("swing_result", lambda x: (x == "foul").mean()),
-    hard_contact = ("swing_result", lambda x: (x == "hard contact").mean()),
-    weak_contact = ("swing_result", lambda x: (x == "weak contact").mean())
+    hard_contact = ("swing_result", lambda x: (x == "hard_contact").mean()),
+    weak_contact = ("swing_result", lambda x: (x == "weak_contact").mean())
 )
 overall_probs["pitch_type"] = "rare_pitch"
 
@@ -40,3 +43,13 @@ def baseline_probs(data_x):
     data.loc[(data["pitch_type"].isin(rare_pitch_types) | ~data["pitch_type"].isin(all_pitch_types)), "pitch_type"] = "rare_pitch"
     predicted_probs = data.merge(all_probs, how="left", on=["pitch_type","in_zone","same_hand"])
     return predicted_probs[results]
+
+logloss_v, brier_v, accuracy_v = evaluate_model(validation_y, baseline_probs(validation_x))
+logloss_t, brier_t, accuracy_t = evaluate_model(train_y, baseline_probs(train_x))
+
+print("Train log loss:", logloss_t)
+print("Train Brier score:", brier_t)
+print("Train Accuracy:", accuracy_t)
+print("Validation log loss:", logloss_v)
+print("Validation Brier score:", brier_v)
+print("Validation Accuracy:", accuracy_v)
