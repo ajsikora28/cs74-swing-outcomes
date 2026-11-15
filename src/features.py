@@ -4,4 +4,6 @@ PITCH_FEATURES = ["in_zone","same_hand", "stand", "p_throws", "pitch_type", "rel
 CONTEXT_FEATURES = PITCH_FEATURES + ["inning", "bat_score_diff", "count",
                                      "outs_when_up", "on_3b", "on_2b", "on_1b"]
 
-CATEGORICAL_FEATURES = ["pitch_type", "stand", "p_throws", "count"]    # categorical features to one-hot encode
+PITCH_CATEGORICAL_FEATURES = ["in_zone", "same_hand", "stand", "p_throws", "pitch_type"]
+
+CONTEXT_CATEGORICAL_FEATURES = PITCH_CATEGORICAL_FEATURES + ["count"]

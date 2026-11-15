@@ -1,3 +1,5 @@
+## Baseline model using probabilities of swing results given pitch type, handedness, and in/out of zone
+
 import pandas as pd
 from evaluate import evaluate_model
 
