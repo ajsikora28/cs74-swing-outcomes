@@ -21,10 +21,10 @@ validation_y = pd.read_csv("data/processed/validation_y.csv")["swing_result"]
 # Tune max_depth and learning_rate for each model
 results = []
 start_time = time.perf_counter()
-for d in range(3, 10):
+for d in range(3, 11):
     for r in [0.01, 0.05, 0.1, 0.2]:
-        hgb_pitch = HistGradientBoostingClassifier(random_state=10, learning_rate=r, max_iter=500, max_depth=d, max_leaf_nodes=None, early_stopping=False, categorical_features=PITCH_CATEGORICAL_FEATURES).fit(train_x_pitch, train_y)
-        hgb_context = HistGradientBoostingClassifier(random_state=10, learning_rate=r, max_iter=500, max_depth=d, max_leaf_nodes=None, early_stopping=False, categorical_features=CONTEXT_CATEGORICAL_FEATURES).fit(train_x_context, train_y)
+        hgb_pitch = HistGradientBoostingClassifier(random_state=10, learning_rate=r, max_iter=1000, max_depth=d, max_leaf_nodes=None, early_stopping=False, categorical_features=PITCH_CATEGORICAL_FEATURES).fit(train_x_pitch, train_y)
+        hgb_context = HistGradientBoostingClassifier(random_state=10, learning_rate=r, max_iter=1000, max_depth=d, max_leaf_nodes=None, early_stopping=False, categorical_features=CONTEXT_CATEGORICAL_FEATURES).fit(train_x_context, train_y)
 
         pitch_losses = []
         for probs in hgb_pitch.staged_predict_proba(validation_x_pitch):
@@ -44,7 +44,7 @@ for d in range(3, 10):
         
         pd.DataFrame(results).to_csv("results/metrics/hgb_tuning_results.csv", index=False)
 
-        print(f"[{len(results)}/28] depth={d}, lr={r} | "
+        print(f"[{len(results)}/32] depth={d}, lr={r} | "
               f"pitch {best_pitch_loss:.4f} ({best_pitch_index + 1} trees) | "
               f"context {best_context_loss:.4f} ({best_context_index + 1} trees) | "
               f"{(time.perf_counter() - start_time) / 60:.0f} min elapsed", flush=True)
