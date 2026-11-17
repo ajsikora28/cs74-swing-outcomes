@@ -4,9 +4,9 @@ import pandas as pd
 from evaluate import evaluate_model
 
 train_x = pd.read_csv("data/processed/train_x.csv")
-train_y = pd.read_csv("data/processed/train_y.csv")
+train_y = pd.read_csv("data/processed/train_y.csv")["swing_result"]
 validation_x = pd.read_csv("data/processed/validation_x.csv")
-validation_y = pd.read_csv("data/processed/validation_y.csv")
+validation_y = pd.read_csv("data/processed/validation_y.csv")["swing_result"]
 
 train = pd.concat([train_x, train_y], axis=1)
 
@@ -22,7 +22,6 @@ probs = train.groupby(["pitch_type","in_zone","same_hand"],as_index=False).agg(
 pitch_type_counts = train["pitch_type"].value_counts()
 all_pitch_types = pitch_type_counts.index.to_list()
 rare_pitch_types = pitch_type_counts[pitch_type_counts < 100].index.to_list()
-print(rare_pitch_types)
 
 # Create an overall probs df for rare pitch types
 overall_probs = train.groupby(["in_zone","same_hand"],as_index=False).agg(
@@ -49,9 +48,14 @@ def baseline_probs(data_x):
 logloss_v, brier_v, accuracy_v = evaluate_model(validation_y, baseline_probs(validation_x))
 logloss_t, brier_t, accuracy_t = evaluate_model(train_y, baseline_probs(train_x))
 
+results = []
+results.append({"log_loss": logloss_v, "brier": brier_v, "accuracy": accuracy_v})
+
 print("Train log loss:", logloss_t)
 print("Train Brier score:", brier_t)
 print("Train Accuracy:", accuracy_t)
 print("Validation log loss:", logloss_v)
 print("Validation Brier score:", brier_v)
 print("Validation Accuracy:", accuracy_v)
+
+pd.DataFrame(results).to_csv("results/metrics/baseline_metrics.csv", index=False)
