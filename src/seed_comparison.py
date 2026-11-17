@@ -4,7 +4,6 @@ import pandas as pd
 import numpy as np
 from sklearn.ensemble import HistGradientBoostingClassifier
 from sklearn.metrics import log_loss
-import time
 
 train_x = pd.read_csv("data/processed/train_x.csv")[CONTEXT_FEATURES]
 train_y = pd.read_csv("data/processed/train_y.csv")["swing_result"]
