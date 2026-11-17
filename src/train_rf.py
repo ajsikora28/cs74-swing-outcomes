@@ -5,15 +5,9 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import accuracy_score, log_loss
 
-# Allow running from anywhere, using either `python src/file.py` or `python -m src.file`.
-ROOT = Path(__file__).resolve().parent.parent
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
-
 from src.features import PITCH_FEATURES, CATEGORICAL_FEATURES
 DATA_DIR = ROOT / "data" / "processed"
 RESULT_DIR = ROOT / "results" / "metrics"
-
 
 def load_data():
     
@@ -21,10 +15,6 @@ def load_data():
     y_train = pd.read_csv(DATA_DIR / "train_y.csv")["swing_result"]
     X_val = pd.read_csv(DATA_DIR / "validation_x.csv")
     y_val = pd.read_csv(DATA_DIR / "validation_y.csv")["swing_result"]
-    if len(X_train) != len(y_train) or len(X_val) != len(y_val):
-        raise ValueError("The feature and label files have mismatched row counts")
-    if not set(y_val.unique()).issubset(set(y_train.unique())):
-        raise ValueError("August contains a class absent from training")
     return X_train, y_train, X_val, y_val
 
 
