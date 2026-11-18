@@ -1,0 +1,3 @@
+model,features,max_depth,min_samples_leaf,n_estimators,val_log_loss,val_brier,val_accuracy
+rf,pitch,24,5,300,1.0910683126641705,0.5508967625801681,0.5585837752897269
+rf,context,36,5,300,1.0374676077598117,0.5232303570291028,0.5888086819878217

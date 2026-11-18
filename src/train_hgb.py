@@ -86,6 +86,8 @@ else:
     fig.savefig("results/figures/hgb_tuning_heatmap.png", dpi=200)
 
 
+
+# Get the best hyperparameters and create final model
 best_pitch_row = results[results["best_pitch_loss"] == results["best_pitch_loss"].min()].iloc[0]
 best_context_row = results[results["best_context_loss"] == results["best_context_loss"].min()].iloc[0]
 
