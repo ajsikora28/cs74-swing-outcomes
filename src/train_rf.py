@@ -26,7 +26,7 @@ train_pitch_encoded, val_pitch_encoded = encode(train_x_pitch, validation_x_pitc
 train_context_encoded, val_context_encoded = encode(train_x_context, validation_x_context, CONTEXT_CATEGORICAL_FEATURES)
 
 # Set to True to run the tuning process
-RUN_TUNING = True
+RUN_TUNING = False
 
 if not RUN_TUNING:
     results = pd.read_csv("results/metrics/rf_tuning_results.csv")
