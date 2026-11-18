@@ -53,8 +53,10 @@ rf_train_context_encoded, rf_test_context_encoded = encode("rf", train_x_context
 
 
 # Train the final models
+print("Fitting baseline")
 all_probs, overall_probs, rare_pitch_types, all_pitch_types = create_baseline_table(pd.concat([full_train_x, full_train_y], axis=1))
 
+print("Fitting HGB pitch")
 final_hgb_pitch = HistGradientBoostingClassifier(random_state=10,
                                                  learning_rate=hgb_pitch["learning_rate"],
                                                  max_iter=int(hgb_pitch["max_iter"]),
@@ -62,6 +64,7 @@ final_hgb_pitch = HistGradientBoostingClassifier(random_state=10,
                                                  max_leaf_nodes=None,
                                                  early_stopping=False,
                                                  categorical_features=PITCH_CATEGORICAL_FEATURES).fit(train_x_pitch, full_train_y)
+print("Fitting HGB context")
 final_hgb_context = HistGradientBoostingClassifier(random_state=10,
                                                    learning_rate=hgb_context["learning_rate"],
                                                    max_iter=int(hgb_context["max_iter"]),
@@ -70,23 +73,27 @@ final_hgb_context = HistGradientBoostingClassifier(random_state=10,
                                                    early_stopping=False,
                                                    categorical_features=CONTEXT_CATEGORICAL_FEATURES).fit(train_x_context, full_train_y)
 
+print("Fitting logreg pitch")
 final_logreg_pitch = LogisticRegression(l1_ratio=1 if logreg_pitch["penalty"] == "L1" else 0,
                                         C=logreg_pitch["C"],
                                         solver="saga" if logreg_pitch["penalty"] == "L1" else "lbfgs",
                                         max_iter=1000,
                                         random_state=42).fit(logreg_train_pitch_encoded, full_train_y)
+print("Fitting logreg context")
 final_logreg_context = LogisticRegression(l1_ratio=1 if logreg_context["penalty"] == "L1" else 0,
                                         C=logreg_context["C"],
                                         solver="saga" if logreg_context["penalty"] == "L1" else "lbfgs",
                                         max_iter=1000,
                                         random_state=42).fit(logreg_train_context_encoded, full_train_y)
 
+print("Fitting RF pitch")
 final_rf_pitch = RandomForestClassifier(n_estimators=int(rf_pitch["n_estimators"]),
                                         max_depth=int(rf_pitch["max_depth"]),
                                         min_samples_leaf=int(rf_pitch["min_samples_leaf"]),
                                         max_samples=0.7,
                                         random_state=42,
                                         n_jobs=-1).fit(rf_train_pitch_encoded, full_train_y)
+print("Fitting RF context")
 final_rf_context = RandomForestClassifier(n_estimators=int(rf_context["n_estimators"]),
                                           max_depth=int(rf_context["max_depth"]),
                                           min_samples_leaf=int(rf_context["min_samples_leaf"]),
