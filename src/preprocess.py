@@ -63,7 +63,7 @@ data.loc[data["stand"] == "L", "spin_axis"] = 360 - data.loc[data["stand"] == "L
 # Split into train, validation, and test sets based on game month
 train_data = data[data["game_date"].str[5:7].isin(["03","04", "05", "06", "07"])]
 validation_data = data[data["game_date"].str[5:7] == "08"]
-test_data = data[data["game_date"].str[5:7].isin(["09", "10"])]
+test_data = data[data["game_date"].str[5:7] == "09"]
 
 train_x = train_data.drop(columns=["swing_result"])
 train_y = train_data["swing_result"]
