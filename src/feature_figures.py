@@ -9,6 +9,16 @@ FEATURE_ANALYSIS = "results/metrics/hgb_feature_analysis.csv"
 TUNING = "results/metrics/hgb_tuning_results.csv"
 SEEDS = "results/metrics/other_seeds.csv"
 
+# Readable names for the feature groups (keys match features.py)
+GROUP_LABELS = {"location": "Location",
+                "movement": "Movement",
+                "stuff": "Stuff\n(velocity, spin)",
+                "release": "Release point",
+                "matchup": "Matchup\n(batter and pitcher hand)",
+                "count": "Count",
+                "base_out_state": "Base/out state",
+                "game_state": "Game state\n(inning, score)"}
+
 features = pd.read_csv(FEATURE_ANALYSIS)
 tuning = pd.read_csv(TUNING)
 seeds = pd.read_csv(SEEDS)
@@ -34,6 +44,7 @@ groups["gain_alone"] = np.where(is_pitch, base - groups["one_only_loss"],
 
 # ---------- Table ----------
 table = groups[["type", "group", "leave_one_out_loss", "removal_cost", "one_only_loss", "gain_alone"]].copy()
+table["label"] = table["group"].map(GROUP_LABELS).fillna(table["group"])
 total_context_gain = full_pitch - full_context
 table["share_of_context_gain"] = np.where(table["type"] == "context",
                                           table["gain_alone"] / total_context_gain, np.nan)
@@ -43,8 +54,9 @@ table.to_csv("results/metrics/hgb_feature_analysis_table.csv", index=False)
 # ---------- Figure ----------
 
 # Shared linear x-axis so bar lengths are directly comparable across both panels
-fig, axes = plt.subplots(1, 2, figsize=(12, 4.5), sharex=True,
-                         gridspec_kw={"width_ratios": [is_pitch.sum(), (~is_pitch).sum()]})
+# Stacked vertically so both panels share the same width and bar thickness
+fig, axes = plt.subplots(2, 1, figsize=(9, 7), sharex=True,
+                         gridspec_kw={"height_ratios": [is_pitch.sum(), (~is_pitch).sum()]})
 panels = [("pitch", "Pitch feature groups"), ("context", "Context feature groups")]
 height = 0.38
 x_max = max(table["removal_cost"].max(), table["gain_alone"].max())
@@ -60,12 +72,16 @@ for ax, (family, title) in zip(axes, panels):
         ax.text(max(cost, 0) + offset, yi + height / 2, f"{cost:.4f}", va="center", fontsize=8)
         ax.text(max(gain, 0) + offset, yi - height / 2, f"{gain:.4f}", va="center", fontsize=8)
 
-    ax.set_yticks(y, sub["group"])
+    ax.set_yticks(y, sub["label"])
     ax.set_xlim(0, x_max * 1.18)  # room for the value labels
     ax.set_title(title)
-    ax.set_xlabel("Change in validation log loss")
 
-axes[0].legend(loc="lower right", fontsize=8)
-fig.tight_layout()
+axes[-1].set_xlabel("Change in validation log loss")
+
+axes[0].legend(loc="lower right", fontsize=9)
+fig.suptitle("Feature group analysis (gradient boosting, validation set, depth 5, learning rate 0.05)", fontsize=12)
+fig.text(0.99, 0.01, f"Seed-to-seed variation in log loss: {noise:.4f}", ha="right", va="bottom",
+         fontsize=8, color="gray")
+fig.tight_layout(rect=(0, 0.03, 1, 1))  # leave room at the bottom for the note
 fig.savefig("results/figures/hgb_feature_analysis.png", dpi=200)
 print("Saved results/figures/hgb_feature_analysis.png and results/metrics/hgb_feature_analysis_table.csv")
